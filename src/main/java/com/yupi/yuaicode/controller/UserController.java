@@ -5,7 +5,10 @@ import com.yupi.yuaicode.common.BaseResponse;
 import com.yupi.yuaicode.common.ResultUtils;
 import com.yupi.yuaicode.exception.ErrorCode;
 import com.yupi.yuaicode.exception.ThrowUtils;
+import com.yupi.yuaicode.model.dto.user.UserLoginRequest;
 import com.yupi.yuaicode.model.dto.user.UserRegisterRequest;
+import com.yupi.yuaicode.model.vo.LoginUserVO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,5 +109,29 @@ public class UserController {
         return ResultUtils.success(result);
     }
 
-
+    @PostMapping("/login")
+    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(userLoginRequest == null, ErrorCode.PARAMS_ERROR);
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+        return ResultUtils.success(loginUserVO);
     }
+
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(loginUser));
+    }
+
+
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR);
+        boolean result = userService.userLogout(request);
+        return ResultUtils.success(result);
+    }
+
+
+
+}
